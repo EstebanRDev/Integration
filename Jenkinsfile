@@ -4,18 +4,17 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-               git credentialsId: '446d658a-7991-4240-9c91-4aed1d70801d', url: 'https://github.com/EstebanRDev/Integration.git', branch: 'main'
+                // Utilizar las credenciales definidas en Jenkins
+                git credentialsId: '446d658a-7991-4240-9c91-4aed1d70801d', url: 'https://github.com/EstebanRDev/Integration.git', branch: 'main'
             }
         }
         stage('Install Dependencies') {
             steps {
-                // Instalar dependencias necesarias para las pruebas en JavaScript 
-                sh 'npm install eslint mocha'
+                sh 'npm install'
             }
         }
-        stage('Run JavaScript Tests') {
+        stage('Run Tests') {
             steps {
-                // Ejecutar pruebas unitarias de JavaScript
                 sh 'npm test'
             }
         }
@@ -26,18 +25,12 @@ pipeline {
                 }
             }
         }
-        stage('Stop and Remove Old Container') {
-            steps {
-                // Detener y eliminar contenedor existente
-                script {
-                    docker.stop('cmiweb')
-                    docker.remove('cmiweb')
-                }
-            }
-        }
         stage('Run Docker Container') {
             steps {
                 script {
+                    // Detener y eliminar el contenedor si ya existe
+                    sh 'docker stop cmiweb || true && docker rm cmiweb || true'
+                    // Ejecutar el nuevo contenedor
                     dockerImage.run("-d -p 8000:80 --name cmiweb")
                 }
             }
