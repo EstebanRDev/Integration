@@ -111,3 +111,5 @@ function lenguage(){
         location.href = "../index.html"; 
     }
 }
+
+export {senEmail};
